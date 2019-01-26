@@ -1,0 +1,27 @@
+{
+  "folders": [
+    {
+      "binary_file_patterns": [
+        "*.sublime-workspace",
+        "_build"
+      ],
+      "folder_exclude_patterns": [
+        "*.sublime-workspace",
+        "_build"
+      ],
+      "file_exclude_patterns": [
+        "*.sublime-workspace"
+      ],
+      "path": "."
+    }
+  ],
+  "settings": {
+    "ensure_newline_at_eof_on_save": true,
+    "tab_size": 4,
+    "translate_tabs_to_spaces": true,
+    "folder_exclude_patterns": [
+      "*.sublime-workspace",
+      "_build"
+    ]
+  }
+}
