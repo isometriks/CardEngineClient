@@ -13,7 +13,7 @@ class HomePage extends Component {
         const { user } = this.state;
 
         return (
-            <div class="home-wrapper">
+            <div className="home-wrapper">
                 <h2>Home</h2>
 
                 <h3>User: {user.username}</h3>
