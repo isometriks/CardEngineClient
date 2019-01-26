@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 
-import PrivateRoute from './PrivateRoute'
 import LoginPage from './LoginPage'
 import HomePage from './HomePage'
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    localStorage.getItem('user')
+      ? <Component {...props} />
+      : <Redirect to='/' />
+  )} />
+)
 
 class CardApp extends Component {
     constructor(props) {

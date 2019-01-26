@@ -11,7 +11,7 @@ class LoginPage extends Component {
     }
 
     setUser (user) {
-        localStorage.setItem("user", user);
+        localStorage.setItem("user", JSON.stringify(user));
 
         this.setState({
             user: user
@@ -27,6 +27,7 @@ class LoginPage extends Component {
         };
 
         this.setUser(userObj);
+        this.props.history.push("/home");
     }
 
     render () {
