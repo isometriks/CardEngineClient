@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 import LoginPage from './LoginPage'
-import HomePage from './HomePage'
+import LobbyPage from './LobbyPage'
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (
@@ -23,7 +23,7 @@ class CardApp extends Component {
             <div>
                 <Switch>
                     <Route exact path='/' component={LoginPage}/>
-                    <PrivateRoute path='/home' component={HomePage}/>
+                    <PrivateRoute path='/home' component={LobbyPage}/>
                 </Switch>
             </div>
         )

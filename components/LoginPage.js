@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import axios from 'axios';
+import api from '../shared/api';
 
 function RegisterLabel (props) {
     const {
@@ -66,8 +66,14 @@ class LoginPage extends Component {
             password: self.getInputValue("password")
         };
 
-        axios.post("http://192.168.99.100:8081/login", userObj)
+        api.login(userObj)
             .then(res => {
+                //
+                // succesfully logged in
+                //
+
+                console.log("Login res: ", res);
+
                 this.setUser(userObj);
                 this.props.history.push("/home");
             }).catch(error => {
@@ -77,7 +83,12 @@ class LoginPage extends Component {
                     if (status === 422) {
                         self.setError("login", "Enter username / password");
                         return;
-                    }
+                    } else if (status === 401) {
+                        self.setError("login", "Incorrect username / password");
+                        return;
+                    }  
+
+                    self.setError("login", "Error logging in. Try again later.");
                 }
             });
     }
@@ -90,8 +101,12 @@ class LoginPage extends Component {
             fullName: self.getInputValue("fullname")
         };
 
-        axios.post("http://192.168.99.100:8081/register", registerObj)
+        api.register(registerObj)
             .then(res => {
+                //
+                // succesfully registered
+                //
+
                 self.setState({
                     loginUsername: registerObj.username
                 });
@@ -106,6 +121,20 @@ class LoginPage extends Component {
             });
     }
 
+    handleLoginKeyPress (event) {
+        const { charCode } = event;
+
+        if (charCode === 13) {
+            this.testLogin();
+        } else {
+            if (this.state.loginError) {
+                this.setState({
+                    loginError: false
+                });
+            }
+        }
+    }
+
     renderLogin () {
         const { 
             loginUsername, 
@@ -115,7 +144,7 @@ class LoginPage extends Component {
         } = this.state;
 
         return (
-            <div className="login-wrapper">
+            <div className="login-wrapper" onKeyPress={(event) => this.handleLoginKeyPress(event)}>
                 <h2>Login to CardEngine</h2>
                 <h3 className="error-text">{ loginError ? loginErrorText : "" }</h3>
 
