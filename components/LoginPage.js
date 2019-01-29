@@ -72,8 +72,6 @@ class LoginPage extends Component {
                 // succesfully logged in
                 //
 
-                console.log("Login res: ", res);
-
                 this.setUser(userObj);
                 this.props.history.push("/home");
             }).catch(error => {
@@ -108,11 +106,8 @@ class LoginPage extends Component {
                 //
 
                 self.setState({
+                    registerSuccess: true,
                     loginUsername: registerObj.username
-                });
-
-                self.setState({
-                    registerSuccess: true
                 });
             }).catch(error => {
                 const { data, status, headers } = error.response;
