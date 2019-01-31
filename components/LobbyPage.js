@@ -14,8 +14,9 @@ class LobbyPage extends Component {
             hasCurrentTable: false,
             connected: false,
             shouldSeatPlayer: false,
-            currentTable: {},
-            currentMatch: {},
+            canReconnect: false,
+            table: {},
+            match: {},
             tables: []
         };
 
@@ -33,6 +34,7 @@ class LobbyPage extends Component {
 
         const handlerMap = {
             'open': this.handleSocketConnect.bind(self),
+            'close': this.handleSocketClose.bind(self),
             'message': this.handleSocketMessage.bind(self)
         }
 
@@ -42,13 +44,14 @@ class LobbyPage extends Component {
     }
 
     handleSocketConnect (e) {
-        const { shouldSeatPlayer } = this.state;
+        const { shouldSeatPlayer, canReconnect } = this.state;
         
         if (shouldSeatPlayer) {
-            const { matchId } = this.state.currentMatch;
+            const { matchId } = this.state.match;
+            const gameCmd = canReconnect ? "game.reconnect" : "game.join";
 
-            console.log("sending game.join to table");
-            this.props.wsApi.send("game.join", { matchId: matchId });
+            console.log(`sending ${gameCmd} to table`);
+            this.props.wsApi.send(gameCmd, { matchId: matchId });
 
             this.setState({
                 shouldSeatPlayer: false
@@ -60,6 +63,15 @@ class LobbyPage extends Component {
         });
     }
 
+    handleSocketClose (e) {
+        console.log("ws close: ", e);
+        const { code } = e;
+
+        if (code === 1008) {
+            console.log("Unauthorized ws in lobby.");
+        }
+    }
+
     handleSocketMessage (e) {
         const { key, cmd, message } = SocketAPI.parseMessage(e);
         console.log("Got lobby message: ", key, cmd, message);
@@ -67,6 +79,27 @@ class LobbyPage extends Component {
         switch (key) {
             case "table":
                 this.handleTableMessage(cmd, message);
+            break;
+
+
+            case "player":
+                this.handlePlayerMessage(cmd, message);
+            break;
+        }
+    }
+
+    handlePlayerMessage (cmd, message) {
+        console.log("Player ws msg: ", cmd, message);
+
+        switch (cmd) {
+            case "update":
+                console.log("got player update: ", message);
+
+                this.setState({
+                    player: message
+                });
+
+                this.props.playerApi.set(message);
             break;
         }
     }
@@ -80,13 +113,13 @@ class LobbyPage extends Component {
 
                 if (gameStarted) {
                     console.log("Table sent update that game started?");
-                    this.moveToGame();
+                    this.moveToGame(message);
 
                     return;
                 }
 
                 this.setState({
-                    currentMatch: message
+                    match: message
                 });
             break;
         }
@@ -103,6 +136,14 @@ class LobbyPage extends Component {
                 console.log("Table Check: ", data);
 
                 if (data) {
+                    const { gameStarted } = data;
+
+                    if (gameStarted) {
+                        this.setState({
+                            canReconnect: true
+                        });
+                    }
+
                     this.setCurrentTable(data);
                     this.joinMatch(data);
                 } else {
@@ -144,7 +185,7 @@ class LobbyPage extends Component {
         this.setState({
             finishedLoading: true,
             hasCurrentTable: true,
-            currentTable: table
+            table: table
         });
     }
 
@@ -158,8 +199,8 @@ class LobbyPage extends Component {
             console.log("join match worked: ", data);
 
             this.setState({
-                currentTable: table,
-                currentMatch: data,
+                table: table,
+                match: data,
                 hasCurrentTable: true,
                 shouldSeatPlayer: true,
                 inMatch: true
@@ -171,17 +212,17 @@ class LobbyPage extends Component {
         });
     }
 
-    leaveMatch (table) {
-        const { currentTable } = this.state;
-        console.log("table: ", currentTable);
+    leaveMatch () {
+        const { table } = this.state;
+        console.log("table: ", table);
 
         api.leaveMatch({
-            gameName: currentTable.gameName,
-            tableId: currentTable.tableId
+            gameName: table.gameName,
+            tableId: table.tableId
         }).then(res => {
             this.setState({
-                currentTable: {},
-                currentMatch: {},
+                table: {},
+                match: {},
                 hasCurrentTable: false,
                 inMatch: false
             });
@@ -193,17 +234,17 @@ class LobbyPage extends Component {
     }
 
     abandonMatch () {
-        const { currentTable } = this.state;
+        const { table } = this.state;
 
         api.abandonMatch({
-            gameName: currentTable.gameName,
-            tableId: currentTable.tableId
+            gameName: table.gameName,
+            tableId: table.tableId
         }).then(res => {
             console.log("abandon res: ", res);
 
             this.setState({
-                currentTable: {},
-                currentMatch: {},
+                table: {},
+                match: {},
                 hasCurrentTable: false,
                 inMatch: false
             });
@@ -215,13 +256,15 @@ class LobbyPage extends Component {
     }
 
     readyMatch () {
-        const { matchId } = this.state.currentMatch;
+        const { matchId } = this.state.match;
 
         console.log("Readying match: ", matchId);
         this.props.wsApi.send("game.ready", { matchId: matchId });
     }
 
-    moveToGame () {
+    moveToGame (match) {
+        console.log("============================================");
+        this.props.matchApi.set(match);
         this.props.history.push("/game");
     }
 
@@ -250,8 +293,9 @@ class LobbyPage extends Component {
     renderCurrentMatch () {
         const { 
             inMatch,
-            currentTable,
-            currentMatch
+            canReconnect,
+            table,
+            match
         } = this.state;
 
         const controls = (
@@ -264,13 +308,21 @@ class LobbyPage extends Component {
                     </div>
                 ) : "" }
 
+                { canReconnect ? (
+                    <div>
+                        <button 
+                            onClick={() => { this.joinMatch(table) }}
+                        >rejoin match</button>
+                    </div>
+                ) : "" }
+
                 <div>
                     <button 
                       onClick={() => { this.leaveMatch() }}
                     >leave match</button>
                 </div>
 
-                { currentTable && currentTable.gameStarted ? (
+                { table && table.gameStarted ? (
                     <div>
                         <button 
                         onClick={() => { this.abandonMatch() }}
@@ -280,7 +332,7 @@ class LobbyPage extends Component {
             </div>
         )
 
-        const seats = currentMatch.seats ? currentMatch.seats.map(seat => {
+        const seats = match.seats ? match.seats.map(seat => {
             return (
                 <li key={ seat.position }>
                     <ul>
@@ -297,10 +349,10 @@ class LobbyPage extends Component {
                 <h3>Current match:</h3>
 
                 <div>
-                    Match name: { currentTable.gameName } - { currentTable.tableId }
+                    Match name: { table.gameName } - { table.tableId }
                 </div>
                 <div>
-                    Match Started? { currentTable.gameStarted ? "yes" : "no" }
+                    Match Started? { table.gameStarted ? "yes" : "no" }
                 </div>
 
                 <div className="match-seats">

@@ -1,16 +1,52 @@
 import React, { Component } from 'react';
 
 import api from '../shared/api';
+import SocketAPI from '../shared/SocketAPI';
+
+import GameBoard from './GameBoard';
 
 class GamePage extends Component {
     constructor(props) {
       super(props);
 
       this.state = {
-        user: JSON.parse(localStorage.getItem('user'))
-      };
+        user: JSON.parse(localStorage.getItem('user')),
+        connected: this.props.wsApi.isConnected(),
+        shouldTryRejoin: false,
+        isMatchOver: false,
+        gameListener: null,
+        gameApi: {
+            listen: (cb) => {
+                this.state.gameListener = cb;
+            },
+            playCard: (card) => {
+                console.log("playing card: ", card); 
+            },
+            sendEvent: (e) => {
+                const { gameListener } = this.state;
 
-      this.setupWebSocket();
+                if (!gameListener) {
+                    console.error("Must setup game listener before sending events.");
+                    return;
+                }
+
+                gameListener(e);
+            }
+        }
+      };
+    }
+
+    componentDidMount () {
+        const match = this.props.matchApi.get();
+        const { empty } = match;
+        console.log("match is: ", match);
+
+        if (empty) {
+            console.log("no match set, moving to lobby.");
+            this.props.history.push("/lobby");
+        }
+
+        this.setupWebSocket();
     }
 
     connectSocket () {
@@ -18,35 +54,110 @@ class GamePage extends Component {
     }
 
     setupWebSocket () {
-        console.log("setting up ws in game.", this.props);
         const { wsApi } = this.props;
         const self = this;
 
         const handlerMap = {
             'open': this.handleSocketConnect.bind(self),
-            'message': this.handleSocketMessage.bind(self)
+            'close': this.handleSocketClose.bind(self),
+            'message': this.handleSocketMessage.bind(self),
+            'error': this.handleSocketError.bind(self)
         }
 
         Object.keys(handlerMap).forEach(key => {
             wsApi.setHandler(key, handlerMap[key]);
         });
-
-        if (!this.props.wsApi.isConnected()) {
-            console.log("connecting ws...");
-            this.connectSocket();
-        }
     }
 
     handleSocketConnect (e) {
-        console.log("game socket con: ", e);
+        console.log("game.ws connected: ", e);
+        this.setState({
+            connected: true
+        });
+    }
+
+    handleSocketClose (e) {
+        console.log("game.ws closed: ", e);
+        const { code } = e;
+
+        if (code === 3403) {
+            console.log("game.ws closed - refused?");
+            console.log("moving player to lobby");
+            
+            this.setGameAbandoned(e);
+            return;  
+        }
+
+        this.setState({
+            connected: false
+        });
     }
 
     handleSocketMessage (e) {
-        console.log("game socket msg: ", e);
+        const { key, cmd, message } = SocketAPI.parseMessage(e);
+        console.log("game.ws message: ", key, cmd, message);
+
+        switch (key) {
+            case "table":
+                this.handleTableMessage(cmd, message);
+            break;
+
+            case "player":
+                this.handlePlayerMessage(cmd, message);
+            break;
+        }
     }
 
-    componentDidMount () {
+    handleSocketError (e) {
+        console.log("game.ws error: ", e);
+    }
 
+    handlePlayerMessage (cmd, message) {
+        console.log("Game.Player ws msg: ", cmd, message);
+
+        switch (cmd) {
+            case "update":
+                console.log("got player update: ", message);
+
+                this.props.playerApi.set(message);
+            break;
+        }
+    }
+
+    handleTableMessage (cmd, message) {
+        console.log("Game.Table ws msg: ", cmd, message);
+
+        switch (cmd) {
+            case "update":
+                const { gameStarted } = message;
+
+                this.props.matchApi.set(message);
+            break;
+
+            case "endEvent":
+                this.handleEndEvent(message);
+            break;
+        }
+    }
+
+    handleEndEvent (e) {
+        const { eventType, result } = e;
+
+        switch (eventType) {
+            case "matchAbandoned":
+                console.log("player abandoned match.");
+
+                this.setGameAbandoned(e);
+            break;
+        }
+    }
+
+    setGameAbandoned (e) {
+        this.setState({
+            isMatchOver: true
+        });
+
+        this.state.gameApi.sendEvent("matchAbandoned");
     }
 
     logout () {
@@ -58,10 +169,71 @@ class GamePage extends Component {
         this.props.history.push("/");
     }
 
+    abandonMatch () {
+        const match = this.props.matchApi.get();
+        const { matchId } = match;
+
+        console.log("abandon match...", match);
+
+        if (this.state.connected) {
+            this.props.wsApi.send("game.abandon", { matchId: matchId });
+        }
+    }
+
+    backToLobby () {
+        this.props.history.push("/lobby");
+    }
+
+    renderControls (){
+        return (
+            <div className="game-controls">
+                <div className="control-item">
+                    <button 
+                      disabled={this.state.isMatchOver}
+                      onClick={() => { this.abandonMatch() }}
+                    >abandon match</button>
+                </div>
+
+                <div className="control-item">
+                    <button
+                      disabled={!this.state.isMatchOver}
+                      onClick={() => { this.backToLobby() }}
+                    >back to lobby</button>
+                </div>
+            </div>
+        )
+    }
+
     render () {
+        const { 
+            isMatchOver,
+            connected,
+            gameApi
+        } = this.state;
+
+        const {
+            matchApi,
+            playerApi
+        } = this.props;
+
+        const boardStatusClass = isMatchOver ? "disabled" : "";
+
+        console.log("rendering player.");
+
         return (
             <div className="game-wrapper">
                 <h2>Game Lobby</h2>
+
+                { connected ? 
+                    (<div>connected to game socket</div>) :
+                    (<div>not connected.</div>) }
+
+                <GameBoard
+                  matchApi={matchApi}
+                  playerApi={playerApi}
+                  gameApi={gameApi} />
+                
+                { this.renderControls() }
             </div>
         )
     }

@@ -32,7 +32,6 @@ class SocketAPI {
   }
 
   connect () {
-    console.log("connecting to ws api", this.handlers);
     const self = this;
 
     let ws =  new WebSocket(config.wsHost);
@@ -45,11 +44,21 @@ class SocketAPI {
   }
 
   isConnected () {
-    return !!this.ws;
+    if (!this.ws) {
+      return false;
+    }
+
+    return this.ws.readyState > 0;
   }
 
   setHandler (which, handler) {
+    const { ws } = this;
+    
     this.handlers[which] = handler;
+
+    if (ws) {
+      ws[`on${which}`] = this.handlers[which];
+    }
   }
 
   send (key, data) {

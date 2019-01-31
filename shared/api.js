@@ -9,8 +9,6 @@ class Api {
 
     addRoute (name, url, method) {
         this[name] = (data) => {
-            console.log("running route: ", name, "data: ", data);
-
             let httpConfig = {
                 url: `${config.apiHost}${url}`,
                 method: method,

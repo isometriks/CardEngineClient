@@ -34,6 +34,13 @@ class LoginPage extends Component {
         registerErrorText: "",
         registerSuccess: false
       };
+
+      const existingUser = localStorage.getItem("user");
+
+      if (existingUser) {
+        console.log("found existing user");
+        this.props.history.push("/lobby");
+      }
     }
 
     setUser (user) {
@@ -73,7 +80,7 @@ class LoginPage extends Component {
                 //
 
                 this.setUser(userObj);
-                this.props.history.push("/home");
+                this.props.history.push("/lobby");
             }).catch(error => {
                 if (error.response) {
                     const { data, status, headers } = error.response;
@@ -179,7 +186,7 @@ class LoginPage extends Component {
                     Username: <input type="text" name="username" defaultValue="jeef"/>
                 </div>
                 <div className="form-item register-password">
-                    Password: <input type="password" name="password" defaultValue="ezpz"/>
+                    Password: <input type="password" name="password" defaultValue="ezez"/>
                 </div>
                 <div className="form-item register-fullname">
                     Full name: <input type="text" name="fullname" defaultValue="Jeef"/>

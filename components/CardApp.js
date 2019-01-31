@@ -21,11 +21,37 @@ class CardApp extends Component {
     constructor(props) {
       super(props);
 
+      const makeStateApi = (prop) => {
+        return {
+          set: this.sharedSetter(prop),
+          get: this.sharedGetter(prop)
+        }
+      };
+
       this.state = {
-        'wsApi': new SocketAPI()
+        'wsApi': new SocketAPI(),
+        'match': { empty: true },
+        'player': {},
+
+        'matchApi': makeStateApi('match'),
+        'playerApi': makeStateApi('player')
       };
 
       this.setup();
+    }
+
+    sharedGetter (prop) {
+      return () => {
+        return this.state[prop];
+      }
+    }
+
+    sharedSetter (prop) {
+      return (val) => {
+        this.setState({
+          [prop]: val
+        });
+      }
     }
 
     setup () {
@@ -38,6 +64,7 @@ class CardApp extends Component {
         console.log("axios error: ", status);
 
         if (status === 403) {
+          localStorage.removeItem("user");
           window.location.href = "/";
 
           return;
@@ -48,14 +75,26 @@ class CardApp extends Component {
     }
 
     render () {
-      const { wsApi } = this.state;
+      const { wsApi, matchApi, playerApi } = this.state;
 
         return (
             <div>
                 <Switch>
                     <Route exact path='/' component={LoginPage}/>
-                    <PrivateRoute path='/home' component={LobbyPage} wsApi={wsApi} />
-                    <PrivateRoute path='/game' component={GamePage} wsApi={wsApi} />
+                    
+                    <PrivateRoute 
+                      path='/lobby' 
+                      component={LobbyPage} 
+                      wsApi={wsApi} 
+                      matchApi={matchApi} 
+                      playerApi={playerApi} />
+                    
+                    <PrivateRoute 
+                      path='/game' 
+                      component={GamePage} 
+                      wsApi={wsApi} 
+                      matchApi={matchApi} 
+                      playerApi={playerApi} />
                 </Switch>
             </div>
         )
