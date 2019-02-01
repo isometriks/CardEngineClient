@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import api from '../shared/api';
 import SocketAPI from '../shared/SocketAPI';
 
+import MenuBar from './MenuBar';
 import GameBoard from './GameBoard';
 
 class GamePage extends Component {
@@ -39,7 +40,6 @@ class GamePage extends Component {
     componentDidMount () {
         const match = this.props.matchApi.get();
         const { empty } = match;
-        console.log("match is: ", match);
 
         if (empty) {
             console.log("no match set, moving to lobby.");
@@ -70,20 +70,17 @@ class GamePage extends Component {
     }
 
     handleSocketConnect (e) {
-        console.log("game.ws connected: ", e);
         this.setState({
             connected: true
         });
     }
 
     handleSocketClose (e) {
-        console.log("game.ws closed: ", e);
         const { code } = e;
 
+        // 3403 happens when socket is refused
         if (code === 3403) {
-            console.log("game.ws closed - refused?");
-            console.log("moving player to lobby");
-            
+
             this.setGameAbandoned(e);
             return;  
         }
@@ -206,6 +203,7 @@ class GamePage extends Component {
 
     render () {
         const { 
+            user,
             isMatchOver,
             connected,
             gameApi
@@ -213,27 +211,24 @@ class GamePage extends Component {
 
         const {
             matchApi,
-            playerApi
+            playerApi,
+            wsApi
         } = this.props;
 
         const boardStatusClass = isMatchOver ? "disabled" : "";
 
-        console.log("rendering player.");
-
         return (
             <div className="game-wrapper">
-                <h2>Game Lobby</h2>
+                <MenuBar user={user} wsApi={wsApi} />
 
-                { connected ? 
-                    (<div>connected to game socket</div>) :
-                    (<div>not connected.</div>) }
-
-                <GameBoard
-                  matchApi={matchApi}
-                  playerApi={playerApi}
-                  gameApi={gameApi} />
-                
-                { this.renderControls() }
+                <div className="game-content">
+                    <GameBoard
+                      matchApi={matchApi}
+                      playerApi={playerApi}
+                      gameApi={gameApi} />
+                    
+                    { this.renderControls() }
+                </div>
             </div>
         )
     }

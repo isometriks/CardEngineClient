@@ -1,0 +1,23 @@
+.login-wrapper,
+.register-wrapper {
+    background-color: #FFF;
+    margin: 0 auto;
+    min-height: 12rem;
+    max-width: 20rem;
+    border: 1px solid #000;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.form-item {
+    margin: 1.5rem 0;
+}
+
+.login-wrapper button,
+.register-wrapper button {
+    min-width: 8rem;
+}
+
+.error-text {
+    color: #FF0000;
+}

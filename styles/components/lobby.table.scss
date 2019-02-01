@@ -1,0 +1,36 @@
+.lobby-table-wrapper {
+    height: 20rem;
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #000;
+
+    .match-seats {
+        width: calc(60vw);
+        margin: 1rem 0;
+    }
+
+    .seat-row {
+        padding: 1rem;
+        width: 80%;
+        border: 1px solid #000;
+
+        &.ready {
+            background-color: #00FFFF;
+        }
+
+        &-name,
+        &-status {
+            display: inline-block;
+        }
+
+        &-status {
+            float: right;
+        }
+    }
+
+    .match-controls {
+        &-item {
+            display: inline-block;
+        }
+    }
+}

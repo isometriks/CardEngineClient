@@ -13,16 +13,14 @@ class GameBoard extends Component {
         const match = this.props.matchApi.get();
         const player = this.props.playerApi.get();
 
-        console.log("game board construct: ", match, player);
-
         this.props.gameApi.listen(this.gameEventHandler.bind(this));
     }
 
     gameEventHandler (e) {
-        console.log("got game event: ", e);
-
         switch (e) {
             case "matchAbandoned":
+                console.log("match was abandoned.");
+                
                 this.setState({
                     isMatchOver: true
                 });
@@ -30,63 +28,58 @@ class GameBoard extends Component {
         }
     }
 
+    getPlayerSeat () {
+        const { playerApi, matchApi } = this.props;
+        const { userId } = playerApi.get();            
+        const { seats } = matchApi.get();
+
+        if (!seats) {
+            return null;
+        }
+
+        return seats.find(seat => { 
+            return seat.userId === userId;
+        });
+    }
+
     renderCards (seat) {
         const { playerApi, gameApi } = this.props;
         const player = playerApi.get();
-
-        console.log("rendering cards: ", player, seat);
-
-        if (player.userId !== seat.userId) {
-            return <div className="player-cards">Private Cards...</div>;    
-        }   
-
         const { cards } = player;
-        return (
-            <div className="player-cards">
-                { cards.map((card, index) => {
-                    return <GameCard key={index} gameApi={gameApi} card={card} />;
-                }) }
-            </div>
-        )
+
+        return cards.map((card, index) => {
+            return <GameCard key={index} gameApi={gameApi} card={card} />;
+        });
     }
 
-    renderSeats () {
-        const self = this;
-        const match = this.props.matchApi.get();
-        const { seats } = match;
+    renderPlayerSeat () {
+        const seat = this.getPlayerSeat();
 
-        if (!seats) {
-            return <div className="seat-wrapper" />;
+        if (!seat) {
+            return <div className="player-seat" />;
         }
 
-        console.log("rendering seats: ", this.state);
-
-        return (
-            <div className="seat-wrapper">
-                {seats.map(seat => {
-                    return (
-                        <div key={ seat.userId } className="player-seat">
-                            Name: { seat.displayName } <br />
-                            Position: { seat.postion } <br />
-
-                            Cards: { self.renderCards(seat) }
-                        </div>
-                    )
-                    
-                })}
-            </div>
-        )
+        return this.renderCards(seat);
     }
 
     render () {
         const { isMatchOver } = this.state;
         const boardClass = isMatchOver ? "board-wrapper disabled" : "board-wrapper";
 
+        const match = this.props.matchApi.get();
+        const { gameState } = match;
+
         return (
             <div className={boardClass}>
-                Game Board
+                <div className="board-area">
+                    Game Board
+                </div>
 
-                { this.renderSeats() }
+                <div className="player-area-buffer" />
+                
+                <div className="player-area">
+                    { this.renderPlayerSeat() }
+                </div>
             </div>
         )
     }

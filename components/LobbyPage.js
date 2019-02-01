@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import api from '../shared/api';
 import SocketAPI from '../shared/SocketAPI';
 
+import MenuBar from './MenuBar';
+
+import LobbyTable from './LobbyTable';
+import LobbyTableList from './LobbyTableList';
+
 class LobbyPage extends Component {
     constructor(props) {
       super(props);
-        console.log("props: ", props);
+        const self = this;
 
         this.state = {
             user: JSON.parse(localStorage.getItem('user')),
@@ -17,10 +22,18 @@ class LobbyPage extends Component {
             canReconnect: false,
             table: {},
             match: {},
-            tables: []
+            tables: [],
+
+            lobbyApi: (method, data) => {
+                return this[method](data);
+            }
         };
 
         this.setupWebSocket();
+    }
+
+    componentDidMount () {
+        this.runTableCheck();
     }
 
     connectSocket () {
@@ -125,15 +138,10 @@ class LobbyPage extends Component {
         }
     }
 
-    componentDidMount () {
-        this.runTableCheck();
-    }
-
     runTableCheck () {
         api.tableCheck()
             .then(res => {
                 const { data } = res;
-                console.log("Table Check: ", data);
 
                 if (data) {
                     const { gameStarted } = data;
@@ -268,116 +276,50 @@ class LobbyPage extends Component {
         this.props.history.push("/game");
     }
 
-    renderTableList () {
-        const { tables } = this.state;
-
-        return (
-            <div className="table-list">
-                <h3>Games:</h3>
-                <ul>
-                    {tables.map((table) => {
-                        return (
-                            <li key={table.tableId}>
-                                <span>
-                                    {table.gameName} - ({table.playerCount} / {table.maxSeatCount})
-                                </span> 
-                                <button onClick={() => { this.joinMatch(table) }}>join</button>
-                            </li>
-                        )
-                    })}
-                </ul>
-            </div>
-        )
-    }
-
-    renderCurrentMatch () {
+    renderLobby () {
         const { 
             inMatch,
             canReconnect,
+            tables,
             table,
-            match
+            match,
+            lobbyApi
         } = this.state;
 
-        const controls = (
-            <div className="match-controls">
-                { inMatch ? (
-                    <div>
-                        <button 
-                            onClick={() => { this.readyMatch() }}
-                        >ready</button>
-                    </div>
-                ) : "" }
-
-                { canReconnect ? (
-                    <div>
-                        <button 
-                            onClick={() => { this.joinMatch(table) }}
-                        >rejoin match</button>
-                    </div>
-                ) : "" }
-
-                <div>
-                    <button 
-                      onClick={() => { this.leaveMatch() }}
-                    >leave match</button>
-                </div>
-
-                { table && table.gameStarted ? (
-                    <div>
-                        <button 
-                        onClick={() => { this.abandonMatch() }}
-                        >abandon match</button>
-                    </div>
-                ) : "" }
-            </div>
-        )
-
-        const seats = match.seats ? match.seats.map(seat => {
+        if (this.state.hasCurrentTable) {
             return (
-                <li key={ seat.position }>
-                    <ul>
-                        <li>Seat: { seat.displayName }</li>
-                        <li>Is Seated? { seat.isSeated ? "yes" : "no" }</li>
-                        <li>Ready? { seat.isReady ? "yes" : "no" }</li>
-                    </ul>
-                </li>
+                <LobbyTable
+                  lobbyApi={lobbyApi}
+                  table={table} 
+                  match={match}
+                  inMatch={inMatch}
+                  canReconnect={canReconnect} />
             )
-        }) : (<li>Nobody seated.</li>);
-
-        return (
-            <div>
-                <h3>Current match:</h3>
-
-                <div>
-                    Match name: { table.gameName } - { table.tableId }
-                </div>
-                <div>
-                    Match Started? { table.gameStarted ? "yes" : "no" }
-                </div>
-
-                <div className="match-seats">
-                    <ol>{ seats }</ol>
-                </div>
-
-                { controls }
-            </div>
-        )
-    }
-
-    renderLobby () {
-        return this.state.hasCurrentTable ? this.renderCurrentMatch() : this.renderTableList();
+        } else {
+            return (
+                <LobbyTableList tables={tables} lobbyApi={lobbyApi} />
+            )
+        }
     }
 
     render () {
-        const { user, tables, inMatch, finishedLoading } = this.state;
+        const { 
+            user, 
+            tables, 
+            inMatch, 
+            finishedLoading
+        } = this.state;
+
+        const { wsApi } = this.props;
 
         return (
             <div className="home-wrapper">
-                <h2>Home</h2>
-                <h3>User: {user.username}</h3>
-                <button onClick={() => { this.logout() }}>logout</button>
-
-                { finishedLoading ? this.renderLobby() : <div>Loading...</div> }
+                <MenuBar user={user} wsApi={wsApi} />
+                
+                <div className="lobby-wrapper">
+                    { finishedLoading ? 
+                        this.renderLobby() : <div>Loading...</div> }
+                </div>
             </div>
         )
     }

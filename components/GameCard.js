@@ -14,8 +14,12 @@ class GameCard extends Component {
         const { card, gameApi } = this.state;
 
         return (
-            <div onClick={() => { gameApi.playCard(card) }}>
-                { card.suitColor } - { card.name } - {card.suitName }
+            <div 
+              className="game-card" 
+              onClick={() => { gameApi.playCard(card) }}>
+                <div>{ card.suitColor }</div>
+                <div>{ card.name }</div>
+                <div>{card.suitName }</div>
             </div>
         )
     }

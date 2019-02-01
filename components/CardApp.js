@@ -5,6 +5,8 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import axios from 'axios'
 import SocketAPI from '../shared/SocketAPI'
 
+import '../styles/main.scss'
+
 import LoginPage from './LoginPage'
 import LobbyPage from './LobbyPage'
 import GamePage from './GamePage'
