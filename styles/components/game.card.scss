@@ -1,4 +1,29 @@
 .game-card {
+    background-color: #FFF;
     border: 1px solid #333;
+    border-radius: 0.75rem;
     width: 6rem;
+    cursor: pointer;
+    margin: 0.5rem;
+
+    &:hover {
+        border: 1px solid #0000CD;
+    }
+
+    &-content {
+        padding: 0.5rem;
+
+        .card-symbol {
+            font-size: 30px;
+            height: 15px;
+            width: 15px;
+            line-height: 15px;
+        }
+    }
+
+    &.red {
+        .card-symbol {
+            color: #FF0000;
+        }
+    }
 }

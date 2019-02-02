@@ -22,6 +22,35 @@ class GamePage extends Component {
             },
             playCard: (card) => {
                 console.log("playing card: ", card); 
+                const { wsApi, matchApi } = this.props;
+                const { matchId } = matchApi.get();
+                const { value, suitName } = card;
+
+                wsApi.send("card.play", {
+                    matchId: matchId,
+                    card: value,
+                    suit: suitName
+                });
+            },
+            placeBid: (bid) => {
+                const { wsApi, matchApi } = this.props;
+                const { matchId } = matchApi.get();
+
+                console.log("placing bid: ", bid);
+                wsApi.send("bid.place", {
+                    matchId: matchId,
+                    bid: bid
+                });
+            },
+            pickSuit: (suit) => {
+                const { wsApi, matchApi } = this.props;
+                const { matchId } = matchApi.get();
+
+                console.log("picked suit: ", suit);
+                wsApi.send("bid.trump", {
+                    matchId: matchId,
+                    suit: suit
+                });
             },
             sendEvent: (e) => {
                 const { gameListener } = this.state;

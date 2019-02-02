@@ -1,0 +1,58 @@
+.game-roster-wrapper {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 14rem;
+
+    .roster-seat {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        height: 2.5rem;
+        margin-bottom: 0.5rem;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &.active {
+            border: 1px solid #0000FF;
+            border-radius: 1.25rem;
+            background-color: #FFF;
+        }
+
+
+        &-dealer-icon {
+            margin-left: 0.25rem;
+            width: 4rem;
+            height: 2rem;
+            border: 1px solid #333;
+            border-radius: 1.25rem;
+            background-color: #00FFFF;
+
+            div {
+                padding: 0.5rem 0.55rem;
+            }
+        }
+
+        &-bid-icon {
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid #0000FF;
+            border-radius: 100%;
+            background-color: #00FF11;
+            margin-right: 0.25rem;
+
+            .bid-number {
+                margin: 0.5rem 0.75rem;
+            }
+        }
+
+        &-label {
+            height: 1rem;
+            width: 5.25rem;
+            margin-left: 0.5rem;
+        }
+    }
+}

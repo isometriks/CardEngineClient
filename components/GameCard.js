@@ -5,21 +5,40 @@ class GameCard extends Component {
       super(props);
 
         this.state = {
-            gameApi: this.props.gameApi,
-            card: this.props.card
-        }
+            isDisplay: this.props.isDisplay || false
+        };
+    }
+
+    suitAscii (suit) {
+        const symbols = {
+            "Diamonds": "♦",
+            "Hearts": "♥",
+            "Spades": "♠",
+            "Clubs": "♣"
+        };
+
+        return symbols[suit];
     }
 
     render () {
-        const { card, gameApi } = this.state;
+        const { isDisplay } = this.state;
+        const { card, gameApi } = this.props;
+        const { 
+            name,
+            suitName,
+            suitColor
+        } = card;
+
+        const cardClass = `game-card ${suitColor}`;
 
         return (
             <div 
-              className="game-card" 
-              onClick={() => { gameApi.playCard(card) }}>
-                <div>{ card.suitColor }</div>
-                <div>{ card.name }</div>
-                <div>{card.suitName }</div>
+              className={ cardClass }
+              onClick={() => {if (!isDisplay) { gameApi.playCard(card) }}}>
+                <div className="game-card-content">
+                    <div className="card-symbol">{ this.suitAscii(suitName) }</div>
+                    <div>{ name }</div>
+                </div>
             </div>
         )
     }

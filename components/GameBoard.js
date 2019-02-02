@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 
+import GameRoster from './GameRoster';
+import GameSuit from './GameSuit';
+import GameBid from './GameBid';
+import GamePlayArea from './GamePlayArea';
 import GameCard from './GameCard';
 
 class GameBoard extends Component {
@@ -44,8 +48,7 @@ class GameBoard extends Component {
 
     renderCards (seat) {
         const { playerApi, gameApi } = this.props;
-        const player = playerApi.get();
-        const { cards } = player;
+        const { cards } = playerApi.get();
 
         return cards.map((card, index) => {
             return <GameCard key={index} gameApi={gameApi} card={card} />;
@@ -64,15 +67,34 @@ class GameBoard extends Component {
 
     render () {
         const { isMatchOver } = this.state;
-        const boardClass = isMatchOver ? "board-wrapper disabled" : "board-wrapper";
-
-        const match = this.props.matchApi.get();
+        const { matchApi, gameApi, playerApi } = this.props;
+        
+        const match = matchApi.get();
         const { gameState } = match;
+
+        const boardClass = isMatchOver ? "board-wrapper disabled" : "board-wrapper";
 
         return (
             <div className={boardClass}>
                 <div className="board-area">
-                    Game Board
+                    <GameRoster
+                      playerApi={playerApi}
+                      matchApi={matchApi} />
+
+                    <GameBid
+                      playerApi={playerApi}
+                      matchApi={matchApi} 
+                      gameApi={gameApi} />
+
+                    <GameSuit
+                      playerApi={playerApi}
+                      matchApi={matchApi} 
+                      gameApi={gameApi} />
+
+                    <GamePlayArea
+                      playerApi={playerApi}
+                      matchApi={matchApi} 
+                      gameApi={gameApi} />
                 </div>
 
                 <div className="player-area-buffer" />
