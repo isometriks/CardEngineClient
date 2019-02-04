@@ -19,6 +19,14 @@
             width: 15px;
             line-height: 15px;
         }
+
+        .card-value {
+            margin: 0.25rem;
+        }
+    }
+
+    &.in-play {
+        background-color: #CCC;
     }
 
     &.red {

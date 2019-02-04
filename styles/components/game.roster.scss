@@ -5,12 +5,19 @@
     width: 14rem;
 
     .roster-seat {
+        cursor: pointer;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
         height: 2.5rem;
         margin-bottom: 0.5rem;
+
+        &:hover {
+            .roster-seat-score {
+                display: flex;
+            }
+        }
 
         &:last-child {
             margin-bottom: 0;
@@ -22,6 +29,23 @@
             background-color: #FFF;
         }
 
+        &-score {
+            display: none;
+            background-color: #FFF;
+            position: absolute;
+            right: -1.5rem;
+            border: 1px solid #0000FF;
+            border-radius: 1.25rem;
+            width: 5rem;
+            height: 2.35rem;
+            z-index: -10;
+            justify-content: flex-end;
+            align-items: center;
+
+            .score-label {
+                margin-right: 0.35rem;
+            }
+        }
 
         &-dealer-icon {
             margin-left: 0.25rem;

@@ -51,8 +51,10 @@ class GameSuit extends Component {
         const { matchApi } = this.props;
         const { gameState } = matchApi.get();
 
-        const bidClass = (gameState === "round.pregame") 
-            ? "suit-wrapper" : "suit-wrapper hidden";
+        const showBidding = (gameState === "round.pregame");
+
+        const bidClass = showBidding
+            ? "popup-container suit-wrapper" : "popup-container suit-wrapper hidden";
 
         return (
             <div className={bidClass}>

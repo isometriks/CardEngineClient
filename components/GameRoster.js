@@ -36,11 +36,17 @@ class GameRoster extends Component {
                 </div>
             ) : "";
 
+            const seatScore = seat.score || 0;
+
             return (
                 <div key={seat.position} className="roster-seat active">
                     { dealerIcon }
                     <div className="roster-seat-label">{seat.displayName}</div>
                     { bidIcon }
+
+                    <div className="roster-seat-score">
+                        <div className="score-label">{seatScore}</div>
+                    </div>
                 </div>
             )
         })

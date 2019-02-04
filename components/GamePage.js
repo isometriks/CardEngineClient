@@ -52,7 +52,7 @@ class GamePage extends Component {
                     suit: suit
                 });
             },
-            sendEvent: (e) => {
+            sendEvent: (e, data) => {
                 const { gameListener } = this.state;
 
                 if (!gameListener) {
@@ -60,7 +60,8 @@ class GamePage extends Component {
                     return;
                 }
 
-                gameListener(e);
+                console.log("sending event: ", e, data);
+                gameListener(e, data);
             }
         }
       };
@@ -151,6 +152,7 @@ class GamePage extends Component {
     }
 
     handleTableMessage (cmd, message) {
+        const { gameApi } = this.state;
         console.log("Game.Table ws msg: ", cmd, message);
 
         switch (cmd) {
@@ -158,6 +160,7 @@ class GamePage extends Component {
                 const { gameStarted } = message;
 
                 this.props.matchApi.set(message);
+                gameApi.sendEvent("tableUpdate");
             break;
 
             case "endEvent":
@@ -167,23 +170,50 @@ class GamePage extends Component {
     }
 
     handleEndEvent (e) {
-        const { eventType, result } = e;
+        const { eventType, results } = e;
 
         switch (eventType) {
             case "matchAbandoned":
-                console.log("player abandoned match.");
-
-                this.setGameAbandoned(e);
+                this.setGameAbandoned();
+            break;
+            case "trickEnd":
+                this.setTrickEnded(results);
+            break;
+            case "roundEnd":
+                this.setRoundEnded(results);
+            break;
+            case "matchEnd":
+                this.setMatchEnded(results);
             break;
         }
     }
 
-    setGameAbandoned (e) {
+    setMatchEnded (results) {
+        const { gameApi } = this.state;
+
+        gameApi.sendEvent("matchEnd", results);
+    }
+
+    setRoundEnded (results) {
+        const { gameApi } = this.state;
+
+        gameApi.sendEvent("roundEnd", results);
+    }
+
+    setTrickEnded (results) {
+        const { gameApi } = this.state;
+
+        gameApi.sendEvent("trickEnd", results);
+    }
+
+    setGameAbandoned () {
+        const { gameApi } = this.state;
+
         this.setState({
             isMatchOver: true
         });
 
-        this.state.gameApi.sendEvent("matchAbandoned");
+        gameApi.sendEvent("matchAbandoned");
     }
 
     logout () {
@@ -191,7 +221,6 @@ class GamePage extends Component {
         this.setState({
             user: {}
         });
-
         this.props.history.push("/");
     }
 

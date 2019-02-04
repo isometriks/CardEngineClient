@@ -32,7 +32,7 @@ class GameBid extends Component {
                 bids.map(bid => {
                     const isBidEnabled = (currentBid === null || bid > currentBid || bid === 0);
                     const wrapperClass = isBidEnabled
-                        ? "bid-wrapper" : "bid-wrapper disabled";
+                        ? "popup-container bid-wrapper" : "popup-container bid-wrapper disabled";
                     const bidLabel = (bid === 0) ? "pass" : `Bid ${bid}`;
 
                     return (
@@ -76,10 +76,15 @@ class GameBid extends Component {
     }
 
     render () {
-        const { matchApi } = this.props;
+        const { matchApi, showRoundEnd } = this.props;
         const { gameState } = matchApi.get();
 
-        const bidClass = (gameState === "round.bid") 
+        const showBidding = (
+            gameState === "round.bid" &&
+            !showRoundEnd
+        )
+
+        const bidClass = showBidding
             ? "bidding-wrapper" : "bidding-wrapper hidden";
 
         return (

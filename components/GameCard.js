@@ -26,18 +26,24 @@ class GameCard extends Component {
         const { 
             name,
             suitName,
-            suitColor
+            suitColor,
+            inPlay
         } = card;
 
-        const cardClass = `game-card ${suitColor}`;
+        const playClass = inPlay && !isDisplay ? 'in-play' : '';
+        const cardClass = `game-card ${suitColor} ${ playClass }`;
 
         return (
             <div 
               className={ cardClass }
-              onClick={() => {if (!isDisplay) { gameApi.playCard(card) }}}>
+              onClick={() => {
+                if (!isDisplay && !inPlay) { 
+                    gameApi.playCard(card) 
+                }
+              }}>
                 <div className="game-card-content">
                     <div className="card-symbol">{ this.suitAscii(suitName) }</div>
-                    <div>{ name }</div>
+                    <div className="card-value">{ name }</div>
                 </div>
             </div>
         )
