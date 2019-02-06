@@ -35,10 +35,10 @@ class GameCard extends Component {
 
         return (
             <div 
-              className={ cardClass }
+              className={ cardClass + " ui card"}
               onClick={() => {
-                if (!isDisplay && !inPlay) { 
-                    gameApi.playCard(card) 
+                if (!isDisplay && !inPlay) {
+                    gameApi.playCard(card)
                 }
               }}>
                 <div className="game-card-content">

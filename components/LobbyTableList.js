@@ -15,29 +15,23 @@ class LobbyTableList extends Component {
 
         return (
             <div className="table-list">
-                <h3>Game Lobbies:</h3>
+                <div className="ui vertical fluid menu">
+                    <div className="item">
+                        <h4>Game Lobbies</h4>
+                    </div>
 
-                <ul>
                     {tables.map((table) => {
                         return (
-                            <li className="table-list-row" key={table.tableId}>
-                                <div className="table-list-text">
-                                    <div className="slot-wrapper">
-                                        <div className="table-name">{table.gameName}</div>
-                                        <div className="table-info">
-                                            ({table.playerCount} / {table.maxSeatCount})
-                                        </div>
-                                    </div>
-                                </div> 
+                            <a className="item" key={table.tableId} onClick={() => { lobbyApi("joinMatch", table) }}>
+                                {table.gameName}
 
-                                <div className="table-list-control">
-                                    <button                                 
-                                      onClick={() => { lobbyApi("joinMatch", table) }}>Join Game</button>
+                                <div className="ui teal left pointing label table-info">
+                                    {table.playerCount} / {table.maxSeatCount}
                                 </div>
-                            </li>
+                            </a>
                         )
                     })}
-                </ul>
+                </div>
             </div>
         )
     }

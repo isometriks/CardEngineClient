@@ -22,8 +22,8 @@
     }
 
     .board-area {
-        border: 1px solid #FF0;
         height: 70%;
+        background-color: #076324;
     }
 
     .player-area-buffer {
@@ -70,14 +70,10 @@
     }
 
     .player-area {
+        background-color: #076324;
         display: flex;
         height: calc(30% - 2rem);
-        border: 1px solid #000;
         align-items: stretch;
         justify-content: space-evenly;
-
-        .game-card {
-            flex-basis: auto;
-        }
     }
 }

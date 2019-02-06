@@ -19,35 +19,30 @@ class MenuBar extends Component {
     render () {
         const { username } = this.state.user;
         const { menuOpen } = this.state;
-
         const { wsApi } = this.props;
-
-        const menuState = menuOpen ? "drop-down" : "drop-down hidden";
         const connectionStatus = wsApi.isConnected() ? "ws connected" : "ws not connected";
 
         return (
-            <div className="menu-bar">
-                <div className="connection-status">
-                    <div className="connection-status-label">
+            <div className="ui inverted menu menu-bar">
+                <div className="ui item">
+                    { username }
+                </div>
+                <div className="ui simple dropdown item hamburger-menu">
+                    Menu
+
+                    <i className="dropdown icon"></i>
+                    <div className="menu">
+                        <a className="item">Profile</a>
+                        <a className="item">High Scores</a>
+                        <a className="item">Logout</a>
+                    </div>
+                </div>
+
+                <div className="ui inverted right menu">
+                    <div className="item connection-status">
                         { connectionStatus }
                     </div>
                 </div>
-                
-                <div className="hamburger-menu">
-                    <div
-                      onClick={() => { this.toggle() }} 
-                      className="hamburger-menu-label">Menu</div>
-                </div>
-
-                <div className={menuState}>
-                    <ul>
-                        <li>Profile</li>
-                        <li>High Scores</li>
-                        <li>Logout</li>
-                    </ul>
-                </div>
-
-                
             </div>
         )
     }

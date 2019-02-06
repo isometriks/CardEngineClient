@@ -25,13 +25,13 @@ class GameRoster extends Component {
 
         return seats.map(seat => {
             const dealerIcon = (seat.position === dealerSeat) ? (
-                <div className="roster-seat-dealer-icon">
-                    <div>Dealer</div>
-                </div>
-            ) : "";
+                <i className="ui icon user" />
+            ) : (
+                <i className="ui icon user outline" />
+            );
 
             const bidIcon = (hasBidder && (seat.position === highBidSeat)) ? (
-                <div className="roster-seat-bid-icon">
+                <div className="ui teal left pointing label roster-seat-bid-icon">
                     <div className="bid-number">{currentBid}</div>
                 </div>
             ) : "";
@@ -39,9 +39,12 @@ class GameRoster extends Component {
             const seatScore = seat.score || 0;
 
             return (
-                <div key={seat.position} className="roster-seat active">
-                    { dealerIcon }
-                    <div className="roster-seat-label">{seat.displayName}</div>
+                <div key={seat.position} className="item roster-seat active">
+                    <span>
+                        { dealerIcon }
+                        {seat.displayName}
+                    </span>
+
                     { bidIcon }
 
                     <div className="roster-seat-score">
@@ -54,7 +57,7 @@ class GameRoster extends Component {
 
     render () {
         return (
-            <div className="game-roster-wrapper">
+            <div className="game-roster-wrapper ui vertical menu">
                 { this.renderSeats() }
             </div>
         )

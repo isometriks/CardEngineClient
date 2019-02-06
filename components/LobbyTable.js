@@ -14,11 +14,9 @@ class LobbyTable extends Component {
         } = this.props;
 
         const readyButton = inMatch ? (
-            <div className="match-controls-item">
-                <button onClick={() => { lobbyApi("readyMatch") }}>
-                    ready
-                </button>
-            </div>
+            <button className="ui primary button" onClick={() => { lobbyApi("readyMatch") }}>
+                Ready
+            </button>
         ) : "";
 
         const joinButton = canReconnect ? (
@@ -39,12 +37,11 @@ class LobbyTable extends Component {
 
         return (
             <div className="match-controls">
-                { readyButton }
-                { joinButton }
-
-                <div className="match-controls-item">
-                    <button onClick={() => { lobbyApi("leaveMatch") }}>
-                        leave match
+                <div className="ui small fluid buttons">
+                    { readyButton }
+                    { joinButton }
+                    <button className="ui button red" onClick={() => { lobbyApi("leaveMatch") }}>
+                        Leave
                     </button>
                 </div>
 
@@ -62,27 +59,33 @@ class LobbyTable extends Component {
             const seatClass = seat.isReady ? "seat-row ready" : "seat-row";
 
             return (
-                <li key={ seat.position } className={seatClass}>
-                    <div className="seat-row-status">
-                        { seat.isReady ? "ready" : "not ready" }
+                <div key={ seat.position } className={seatClass + " item"}>
+                    <div className={"ui left pointing label " + (seat.isReady ? "blue" : "red")}>
+                        { seat.isReady ? "Ready" : "Waiting" }
                     </div>
                     
                     <div className="seat-row-name">
                         { seat.displayName }
                     </div>
-                </li>
+                </div>
             )
         }) : (<li>Nobody seated.</li>);
     }
 
     render () {
         return (
-            <div className="lobby-table-wrapper">
-                <div className="match-seats">
-                    <ol>{ this.renderSeats() }</ol>
+            <div className="lobby-table-wrapper ui fluid card">
+                <div className="content">
+                    <div className="match-seats">
+                        <div className="ui fluid vertical menu">
+                            { this.renderSeats() }
+                        </div>
+                    </div>
                 </div>
 
-                { this.renderControls() }
+                <div className="content extra">
+                    { this.renderControls() }
+                </div>
             </div>
         )
     }

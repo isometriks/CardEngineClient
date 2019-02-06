@@ -130,7 +130,9 @@ class GameBoard extends Component {
         cards.reverse();
 
         return cards.map((card, index) => {
-            return <GameCard key={index} gameApi={gameApi} card={card} />;
+            return <div className="ui column">
+                <GameCard key={index} gameApi={gameApi} card={card} />
+            </div>;
         });
     }
 
@@ -250,9 +252,11 @@ class GameBoard extends Component {
                 <div className="player-area-buffer">
                     { this.renderPlayerBuffer() }
                 </div>
-                
-                <div className="player-area">
-                    { this.renderPlayerSeat() }
+
+                <div className="player-area ui segment">
+                    <div className="ui grid six columns">
+                        { this.renderPlayerSeat() }
+                    </div>
                 </div>
             </div>
         )
