@@ -147,27 +147,45 @@ class LoginPage extends Component {
 
         return (
             <div className="login-wrapper" onKeyPress={(event) => this.handleLoginKeyPress(event)}>
-                <h2>Login to CardEngine</h2>
-                <h3 className="error-text">{ loginError ? loginErrorText : "" }</h3>
+                <div className="ui card">
+                    <div className="content">
+                        <div className="header">
+                            Login to CardEngine
+                        </div>
 
-                <div className="form-item login-label-wrapper">
-                    <span className="login-label"></span>
-                </div>
-                <div className="form-item login-user">
-                    Username: <input type="text" name="username" defaultValue={ loginUsername } />
-                </div>
-                <div className="form-item login-password">
-                    Password: <input type="password" name="password" />
-                </div>
-                <div className="form-item login-submit">
-                    <button 
-                      type="button"
-                      onClick={() => { this.testLogin() }}>Login</button>
-                </div>
-                <div className="form-item show-register-submit">
-                    <button 
-                      onClick={() => { this.setState({ showingRegistration: true}) }} 
-                      type="button">Register</button>
+                        <form className="ui form">
+                            <h3 className="error-text">{ loginError ? loginErrorText : "" }</h3>
+
+                            <div className="form-item login-label-wrapper">
+                                <span className="login-label"></span>
+                            </div>
+
+                            <div className="ui field">
+                                <label>Username</label>
+                                <input type="text" name="username" defaultValue={ loginUsername } />
+                            </div>
+
+                            <div className="ui field">
+                                <label>Password</label>
+                                <input type="password" name="password" />
+                            </div>
+                        </form>
+                    </div>
+
+                    <div className="extra content">
+                        <div className="ui small fluid buttons">
+
+                            <button
+                                className="ui button primary"
+                                type="button"
+                                onClick={() => { this.testLogin() }}>Login</button>
+
+                            <button
+                                className="ui button secondary"
+                                onClick={() => { this.setState({ showingRegistration: true}) }}
+                                type="button">Register</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         )
@@ -181,41 +199,61 @@ class LoginPage extends Component {
         } = this.state;
 
         const controls = registerSuccess ? <div className="controls-wrapper"/> : (
-            <div className="controls-wrapper">
-                <div className="form-item register-user">
-                    Username: <input type="text" name="username" defaultValue="jeef"/>
+            <div className="field controls-wrapper">
+                <div className="field">
+                    <label>Username</label>
+                    <input type="text" name="username" defaultValue="jeef"/>
                 </div>
-                <div className="form-item register-password">
-                    Password: <input type="password" name="password" defaultValue="ezez"/>
+
+                <div className="field">
+                    <label>Password</label>
+                    <input type="password" name="password" defaultValue="ezez"/>
                 </div>
-                <div className="form-item register-fullname">
-                    Full name: <input type="text" name="fullname" defaultValue="Jeef"/>
-                </div>
-                <div className="form-item register-submit">
-                    <button 
-                      onClick={() => { this.registerUser() }}
-                      type="button">Register</button>
+
+                <div className="field">
+                    <label>Full Name</label>
+                    <input type="text" name="fullname" defaultValue="Jeef"/>
                 </div>
             </div>
         );
 
+        const buttons = (
+            <button
+                className="ui primary button"
+                onClick={() => { this.registerUser() }}
+                type="button">Register</button>
+
+        );
+
         return (
             <div className="register-wrapper">
-                <h2>User Registration</h2>
+                <div className="ui card">
+                    <div className="content">
+                        <div className="header">
+                            User Registration
+                        </div>
 
-                <div className="form-item register-label-wrapper">
-                    <RegisterLabel 
-                      registerSuccess={registerSuccess}
-                      registerError={registerError}
-                      registerErrorText={registerErrorText} />
-                </div>
+                        <form className="ui form">
+                            <div className="form-item register-label-wrapper">
+                                <RegisterLabel
+                                    registerSuccess={registerSuccess}
+                                    registerError={registerError}
+                                    registerErrorText={registerErrorText} />
+                            </div>
 
-                { controls }
+                            { controls }
+                        </form>
+                    </div>
 
-                <div className="form-item back-submit">
-                    <button 
-                      onClick={() => { this.setState({ showingRegistration: false }) }}
-                      type="button">Back</button>
+                    <div className="content extra">
+                        <div className="ui small fluid buttons">
+                            { buttons }
+                            <button
+                                className="ui button secondary"
+                                onClick={() => { this.setState({ showingRegistration: false }) }}
+                                type="button">Back</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         )
