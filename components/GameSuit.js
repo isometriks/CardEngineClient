@@ -10,22 +10,14 @@ class GameSuit extends Component {
     canPickSuit () {
         const { playerApi, matchApi } = this.props;
         const { position } = playerApi.get();
-        const { currentBidSeat } = matchApi.get();
+        const { highBidSeat } = matchApi.get();
 
-        return position === currentBidSeat;
+        return position === highBidSeat;
     }
 
     renderSuitOptions () {
         const { gameApi, playerApi, matchApi } = this.props;
         const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
-
-        const player = playerApi.get();
-
-        const {
-            currentBid,
-            currentBidSeat,
-            highBidSeat
-        } = matchApi.get();
 
         if (this.canPickSuit()) {
             return (
